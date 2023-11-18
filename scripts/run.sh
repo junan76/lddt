@@ -19,15 +19,16 @@ run_container_bg() {
 main() {
     while getopts ":fb" opt; do
         case "$opt" in
-            f)
+        f)
             run_container
             ;;
-            b)
+        b)
             run_container_bg
             ;;
-            *)
+        *)
             echo "error"
             exit 1
+            ;;
         esac
     done
 }

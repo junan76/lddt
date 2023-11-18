@@ -3,7 +3,9 @@
 KERNEL_VERSION="5.4.260"
 BUSYBOX_VERSION="1.36.1"
 
-LDDT_DEPS_DIR=$(mkdir -p $LDDT_ROOT/deps && cd $LDDT_ROOT/deps && pwd)
+if [ -n "$LDDT_ROOT" ]; then
+    LDDT_DEPS_DIR=$(mkdir -p $LDDT_ROOT/deps && cd $LDDT_ROOT/deps && pwd)
+fi
 
 fetch_option=
 defconfig_option=
@@ -158,7 +160,7 @@ rootfs_handler() {
     rm -rf build/rootfs.ext4
     dd if=/dev/zero of=build/rootfs.ext4 bs=4M count=16
     mkfs.ext4 build/rootfs.ext4
-    
+
     mkdir -p build/mnt
     mount build/rootfs.ext4 build/mnt
     cp -r build/_install/* build/mnt
@@ -194,30 +196,39 @@ docker_handler() {
 }
 
 show_help() {
-    echo help
+    echo "Usage: path/to/build.sh [OPTION]"
+    echo "  A build tool for linux kernel, busybox, rootfs and docker container"
+    echo "Options:"
+    echo "  -f: fetch source code"
+    echo "  -c: run defconfig"
+    echo "  -m: run menuconfig"
+    echo "  -b: run build"
+    echo "  -t: select the target, can be \"k\"(for linux kernel), \"b\"(for busybox) or \"d\"(for docker container build)"
+    echo "  -h: show this help message"
 }
 
 main() {
     while getopts ":fcmbt:" opt; do
         case "$opt" in
-            f)
-                fetch_option=1
-                ;;
-            c)
-                defconfig_option=1
-                ;;
-            m)
-                menuconfig_option=1
-                ;;
-            b)
-                build_option=1
-                ;;
-            t)
-                target=$OPTARG
-                ;;
-            *)
+        f)
+            fetch_option=1
+            ;;
+        c)
+            defconfig_option=1
+            ;;
+        m)
+            menuconfig_option=1
+            ;;
+        b)
+            build_option=1
+            ;;
+        t)
+            target=$OPTARG
+            ;;
+        *)
             show_help
             exit 1
+            ;;
         esac
     done
 
